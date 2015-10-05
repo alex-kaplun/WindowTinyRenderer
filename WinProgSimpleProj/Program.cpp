@@ -3,6 +3,9 @@
 #include <time.h>
 #include <cmath>
 #include <algorithm>
+#include <vector>
+#include "model.h"
+#include <geometry.h>
 
 #define APPTITLE "Hello World"
 
@@ -12,10 +15,13 @@
 #define COLOR_WHITE RGB(255, 255, 255)
 #define COLOR_YELLOW RGB(255,255,0)
 
-#define WINDOW_HEIGHT 400
-#define WINDOW_WIDTH 500
+#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 800
 #define WINDOW_HEADER 40
 
+Model *model = NULL;
+const int width = 800;
+const int height = 800;
 
 BOOL InitInstance(HINSTANCE, int);
 ATOM MyRegisterClass(HINSTANCE);
@@ -168,10 +174,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 void DrawStuff(HDC image)
 {
-	line(13, 20, 80, 40, image, COLOR_WHITE);
+	/*line(13, 20, 80, 40, image, COLOR_WHITE);
 	line(20, 13, 40, 80, image, COLOR_RED);
 	line(80, 40, 13, 20, image, COLOR_RED);
-	line(150, 50, 180, 340, image, COLOR_BLUE);
+	line(150, 50, 180, 340, image, COLOR_BLUE);*/
+	model = new Model("obj/head.obj");
+	for (int i = 0; i < model->nfaces(); i++)
+	{
+		std::vector<int> face = model->face(i);
+		for (int j = 0; j < 3; j++)
+		{
+			Vec3f v0 = model->vert(face[j]);
+			Vec3f v1 = model->vert(face[(j + 1) % 3]);
+			int x0 = (v0.x + 1.)*WINDOW_WIDTH / 2;
+			int y0 = (v0.y + 1.)*WINDOW_HEIGHT / 2;
+			int x1 = (v1.x + 1.)*WINDOW_WIDTH / 2;
+			int y1 = (v1.y + 1.)*WINDOW_HEIGHT / 2;
+			line(x0, y0, x1, y1, image, COLOR_WHITE);
+		}
+	}
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
